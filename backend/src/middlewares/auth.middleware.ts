@@ -8,13 +8,17 @@ export const authMiddleware = async(
     next: NextFunction
 ) => {
     const authHeader = req.headers.authorization;
-    console.log("AUTHHEADER: ", authHeader);
+    // console.log("AUTHHEADER: ", authHeader);
     
     if(!authHeader){
         return next(new ApiError(401, "Unauthorized"));
     }
 
     const token = authHeader.split(" ")[1];
+
+    if(!token){
+        return next(new ApiError(401, "Unauthorized"));
+    }
 
     try {
         const decoded = verifyToken(token);

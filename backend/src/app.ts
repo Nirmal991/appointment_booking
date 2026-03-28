@@ -23,7 +23,9 @@ app.get('/health-check', (req: Request, res: Response) => {
 })
 
 import userRouter from './modules/auth/auth.route.js';
+import orgRouter from './modules/organization/organization.router.js';
 
 app.use('/api/user', userRouter);
+app.use('/api/organization', orgRouter);
 
 export default app;

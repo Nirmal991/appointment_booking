@@ -22,4 +22,8 @@ app.get('/health-check', (req: Request, res: Response) => {
     return res.status(200).json({success: true, message: "Fine"})
 })
 
+import userRouter from './modules/auth/auth.route.js';
+
+app.use('/api/user', userRouter);
+
 export default app;

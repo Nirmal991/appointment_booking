@@ -26,11 +26,13 @@ app.get('/health-check', (req: Request, res: Response) => {
 import userRouter from './modules/auth/auth.route.js';
 import orgRouter from './modules/organization/organization.router.js';
 import serviceRouter from './modules/service/service.route.js';
+import availabilityRuleRouter  from './modules/availability/availability.routes.js';
 
 
 app.use('/api/user', userRouter);
 app.use('/api/organization', orgRouter);
 app.use('/api/service', serviceRouter);
+app.use('/api/availability', availabilityRuleRouter);
 
 app.use(errorHandler);
 

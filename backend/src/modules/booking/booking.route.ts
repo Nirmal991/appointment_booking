@@ -4,7 +4,7 @@ import { cancelBookingController, createBookingController, getBookingsController
 const router = express.Router();
 
 router.route('/').post(createBookingController);
-router.route('/:bookingId').post(cancelBookingController);
+router.route('/:bookingId').patch(cancelBookingController);
 router.route('/:bookingId').get(getBookingsController)
 router.route('/organization/:organizationId').get(getOrganizationBookingsController);
 router.route('/service/:serviceId').get(getServiceBookingsController);

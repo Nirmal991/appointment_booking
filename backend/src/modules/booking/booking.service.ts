@@ -2,6 +2,7 @@ import { th } from "zod/locales";
 import { prisma } from "../../lib/prisma.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { createBookingData } from "./booking.schema.js";
+import { queueBookingConfirmationEmail } from "../email/email.service.js";
 
 export const createBooking = async (data: createBookingData) => {
     const service = await prisma.service.findUnique({
@@ -88,6 +89,8 @@ export const createBooking = async (data: createBookingData) => {
         // if(service.serviceType === "ONLINE"){
         //     await queueCreateMeeting
         // }
+
+        await queueBookingConfirmationEmail(booking.id);
 
         return booking;
     })

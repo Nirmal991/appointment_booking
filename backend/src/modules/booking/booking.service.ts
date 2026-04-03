@@ -1,101 +1,68 @@
-import { th } from "zod/locales";
 import { prisma } from "../../lib/prisma.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { createBookingData } from "./booking.schema.js";
 import { queueBookingCancelEmail, queueBookingConfirmationEmail } from "../email/email.service.js";
+import { queueCreateMeeting } from "../meeting/meet.service.js";
 
-export const createBooking = async (data: createBookingData) => {
-    const service = await prisma.service.findUnique({
-        where: {
-            id: data.serviceId
-        },
-    });
+export const createBooking = async (data: createBookingData, tx: any) => {
+  const db = tx || prisma;
 
-    if (!service) {
-        throw new ApiError(404, "Service not found");
-    }
+  const service = await db.service.findUnique({
+    where: {
+      id: data.serviceId,
+    },
+  }); 
 
-    if (!service.isActive) {
-        throw new ApiError(400, "Service is not active");
-    }
+  if (!service) {
+    throw new ApiError(404, "Service not found");
+  }
 
-    const startTime = new Date(data.startTime);
-    const endTime = new Date(startTime.getTime() + service.durationInMinutes * 60000);
+  if (!service.isActive) {
+    throw new ApiError(400, "Service is not active");
+  }
 
-    const booking = await prisma.$transaction(async (tx) => {
+  const startTime = new Date(data.startTime);
+  const endTime = new Date(
+    startTime.getTime() + service.durationInMinutes * 60000
+  );
 
-        const overlappingBooking = await tx.booking.findFirst({
-            where: {
-                serviceId: data.serviceId,
-                status: {
-                    not: "CANCELLED",
-                },
-                AND: [
-                    {
-                        startTime: {
-                            lt: endTime,
-                        },
-                    },
-                    {
-                        endTime: {
-                            gt: startTime,
-                        },
-                    },
-                ],
-            },
-        });
+  const overlappingBooking = await db.booking.findFirst({
+    where: {
+      serviceId: data.serviceId,
+      status: {
+        not: "CANCELLED",
+      },
+      AND: [{ startTime: { lt: endTime } }, { endTime: { gt: startTime } }],
+    },
+  });
 
-        if (overlappingBooking) {
-            throw new ApiError(400, "Time slot is already booked");
-        }
+  if (overlappingBooking) {
+    throw new ApiError(400, "Time slot already booked");
+  }
 
-        const existingLock = await tx.bookingLock.findFirst({
-            where: {
-                serviceId: data.serviceId,
-                expiresAt: {
-                    gt: new Date(),
-                },
-                AND: [
-                    {
-                        startTime: {
-                            lt: endTime,
-                        },
-                    },
-                    {
-                        endTime: {
-                            gt: startTime,
-                        },
-                    },
-                ],
-            },
-        });
+  const booking = await db.booking.create({
+    data: {
+      organizationId: data.organizationId,
+      serviceId: data.serviceId,
+      customerName: data.customerName,
+      customerEmail: data.customerEmail,
+      customerPhone: data.customerPhone,
+      startTime,
+      endTime,
+    },
+    include: {
+      service: true,
+    },
+  });
 
-        if (existingLock) {
-            throw new ApiError(400, "Slot is temporarily locked");
-        }
+  if (service.serviceType === "ONLINE") {
+    await queueCreateMeeting(booking.id);
+  } else {
+    await queueBookingConfirmationEmail(booking.id);
+  }
 
-        const booking = await tx.booking.create({
-            data: {
-                organizationId: data.organizationId,
-                serviceId: data.serviceId,
-                customerName: data.customerName,
-                customerEmail: data.customerEmail,
-                customerPhone: data.customerPhone,
-                startTime,
-                endTime,
-            }
-        })
-        // FOR ONLINE
-        // if(service.serviceType === "ONLINE"){
-        //     await queueCreateMeeting
-        // }
-
-        await queueBookingConfirmationEmail(booking.id);
-
-        return booking;
-    })
-    return booking;
-}
+  return booking;
+};
 
 export const getBookings = async (bookingId: string) => {
     const booking = await prisma.booking.findUnique({

@@ -18,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const LoginForm = () => {
@@ -37,10 +37,12 @@ const LoginForm = () => {
   const onSubmit = async (data: LoginUserFormData) => {
     try {
       await dispatch(loginUserThunk(data)).unwrap();
+      toast.success("Logged In Successfully");
       router.push("/dashboard");
     } catch (error: any) {
       const message = error || "Invalid email or password";
 
+       toast.error("Login Failed");
       // Optional: show inline error under fields
       setError("email", { message });
       setError("password", { message });

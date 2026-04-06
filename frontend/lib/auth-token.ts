@@ -22,7 +22,7 @@ export const tokenService = {
     clearToken : () => {
         accessToken = null;
         if(typeof window !== 'undefined'){
-            localStorage.removeItem("tpken");
+            localStorage.removeItem("token");
         }
     },
 };

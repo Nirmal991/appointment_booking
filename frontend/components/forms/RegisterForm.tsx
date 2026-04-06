@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react'
+import { toast } from "sonner";
 
 
 const RegisterForm = () => {
@@ -29,6 +30,7 @@ const RegisterForm = () => {
     const onSubmit = async (data: RegisterUserFormData) => {
         try {
             await dispatch(registerUserThunk(data)).unwrap();
+            toast.success("Account created successfully!");
             router.push('/dashboard');
         } catch (error: any) {
             console.log(error);
@@ -37,6 +39,8 @@ const RegisterForm = () => {
                 typeof error === "string"
                     ? error
                     : error?.message || "Registration failed";
+
+                     toast.error(message);
             // Optional: show inline error
             setError("email", { message });
         }

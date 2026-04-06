@@ -1,21 +1,17 @@
-'use client'
+'use client';
 
-import { useAuthInit } from '@/hooks/userAuthInit'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { logout } from '@/redux/slices/authSlice'
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function DashboardPage(){
-  useAuthInit();
-
-  const {user, isLoading} = useAppSelector((s) => s.auth);
-  const dispatch = useAppDispatch();
-
-  if(isLoading) return <p>Loding...</p>
-  if(!user) return <p>Unauthorized...</p>
+export default function DashboardPage() {
   return (
-    <div>
-      <h1>Welcome {user.name}</h1>
-      <button onClick={() => dispatch(logout())}>LOGOUT</button>
-    </div>
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
+
+function DashboardContent() {
+  return (
+    <h1>Dashboard</h1>
   )
-};
+}

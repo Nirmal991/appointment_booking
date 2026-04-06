@@ -4,3 +4,12 @@ export interface IUser {
   email: string;
   role: string;
 }
+
+export interface IOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  timezone: string;
+  plan: "FREE" | "PRO";
+  subscriptionStatus: "ACTIVE" | "INACTIVE" | "CANCELLED";
+}

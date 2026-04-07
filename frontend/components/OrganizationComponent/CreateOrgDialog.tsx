@@ -44,7 +44,7 @@ export default function CreateOrgDialog({
     formState: { errors, isSubmitting },
   } = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
-    defaultValues: { name: "", slug: "", timezone: "Asi a/Kolkata" },
+    defaultValues: { name: "", slug: "", timezone: "Asia/Kolkata" },
   });
 
   const nameValue = watch("name");
@@ -67,7 +67,7 @@ export default function CreateOrgDialog({
       toast.success("Welcome aboard!", {
         description: `${values.name} has been created.`,
       });
-      if (res.payload?.id) dispatch(setCurrentOrg(res.payload.id));
+      // if (res.payload?.id) dispatch(setCurrentOrg(res.payload.id));
       reset();
       setOpen(false);
     } else {

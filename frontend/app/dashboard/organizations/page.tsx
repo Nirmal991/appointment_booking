@@ -1,5 +1,6 @@
 'use client';
 
+import CreateOrgDialog from '@/components/OrganizationComponent/CreateOrgDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -27,7 +28,7 @@ const OrganizationPage = () => {
                         Select or create an organization to manage your appointments.
                     </p>
                 </div>
-                {/* <CreateOrgDialog /> */}
+                <CreateOrgDialog />
             </div>
 
             {isLoading ? (
@@ -50,13 +51,13 @@ const OrganizationPage = () => {
                         started.
                     </p>
                     <div className="mt-6">
-                        {/* <CreateOrgDialog
+                        <CreateOrgDialog
                             trigger={
                                 <Button size="lg">
                                     <Plus className="mr-2 h-4 w-4" /> Create First Org
                                 </Button>
                             }
-                        /> */}
+                        />
                     </div>
                 </div>
             ) : (
